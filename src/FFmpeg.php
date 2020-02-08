@@ -1,0 +1,82 @@
+<?php
+
+namespace Olelo\FFmpeg;
+
+use Olelo\FFmpeg\Exceptions\FFmpegException;
+
+use GuzzleHttp\Client;
+
+class FFmpeg
+{
+    protected $uri;
+    protected $token;
+
+    protected $defaultUri = 'https://ffmpeg.olelo.io/api/v1/';
+
+    public function __construct($token = null, $uri = null)
+    {
+        if(is_null($uri)) {
+            $uri = $this->defaultUri;
+        }
+
+        if(!$this->isValidUrl($uri)) {
+            throw new FFmpegException('"' . $uri . '" is not a valid URL.');
+        }
+
+        if(!($token)) {
+            throw new FFmpegException('You need to configure a token.');
+        }
+
+        $this->uri = $uri;
+        $this->token = $token;
+    }
+
+    /**
+     * Convert a given file.
+     *
+     * @param $uri
+     * @param $commands
+     * @param null $targetFormat
+     * @return string
+     */
+    public function convert($uri, $commands, $targetFormat = null)
+    {
+        $commands = is_array($commands) ? $commands : [$commands];
+
+        $client = new Client([
+            'base_uri' => $this->uri,
+        ]);
+
+        $requestData['headers'] = [
+            'Authorization' => 'Bearer ' . $this->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
+        ];
+
+        $requestData['json'] = [
+            'file' => $uri,
+            'commands' => $commands,
+        ];
+
+        if($targetFormat) {
+            $requestData['json']['targetFormat'] = $targetFormat;
+        }
+
+        return $client->post('conversions', $requestData)->getBody()->getContents();
+    }
+
+    /**
+     * Determine if the given path is a valid URL.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function isValidUrl($path)
+    {
+        if (! preg_match('~^(#|//|https?://|mailto:|tel:)~', $path)) {
+            return filter_var($path, FILTER_VALIDATE_URL) !== false;
+        }
+
+        return true;
+    }
+}
