@@ -43,26 +43,31 @@ class FFmpeg
     {
         $commands = is_array($commands) ? $commands : [$commands];
 
-        $client = new Client([
-            'base_uri' => $this->uri,
-        ]);
-
-        $requestData['headers'] = [
-            'Authorization' => 'Bearer ' . $this->token,
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json'
-        ];
-
-        $requestData['json'] = [
+        $data = [
             'file' => $uri,
             'commands' => $commands,
         ];
 
         if($targetFormat) {
-            $requestData['json']['targetFormat'] = $targetFormat;
+            $data['targetFormat'] = $targetFormat;
         }
 
-        return $client->post('conversions', $requestData)->getBody()->getContents();
+        return $this->getResult('concatenations', $data);
+    }
+
+    /**
+     * Concatenate given files
+     *
+     * @param $files
+     * @param $pause
+     * @return mixed
+     */
+    public function concatenate($files, $pause = 0)
+    {
+        return $this->getResult('concatenations', [
+            'files' => $files,
+            'pause' => $pause
+        ]);
     }
 
     /**
@@ -78,5 +83,22 @@ class FFmpeg
         }
 
         return true;
+    }
+
+    protected function getResult($endpoint, $data)
+    {
+        $client = new Client([
+            'base_uri' => $this->uri,
+        ]);
+
+        $requestData['headers'] = [
+            'Authorization' => 'Bearer ' . $this->token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
+        ];
+
+        $requestData['json'] = $data;
+
+        return $client->post($endpoint, $requestData)->getBody()->getContents();
     }
 }
