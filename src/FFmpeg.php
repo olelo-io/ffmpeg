@@ -52,7 +52,7 @@ class FFmpeg
             $data['targetFormat'] = $targetFormat;
         }
 
-        return $this->getResult('concatenations', $data);
+        return $this->getResult('conversions', $data);
     }
 
     /**
