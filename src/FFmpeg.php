@@ -2,6 +2,7 @@
 
 namespace Olelo\FFmpeg;
 
+use Illuminate\Support\Str;
 use Olelo\FFmpeg\Exceptions\FFmpegException;
 
 use GuzzleHttp\Client;
@@ -93,12 +94,19 @@ class FFmpeg
 
         $requestData['headers'] = [
             'Authorization' => 'Bearer ' . $this->token,
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json'
+            'Content-Type'  => 'application/json',
+            'Accept'        => 'application/json'
         ];
 
         $requestData['json'] = $data;
 
-        return $client->post($endpoint, $requestData)->getBody()->getContents();
+        $response = $client->post($endpoint, $requestData)->getBody()->getContents();
+
+        return $this->isApiVersionV1() ? $response : json_decode($response, true);
+    }
+
+    protected function isApiVersionV1()
+    {
+        return Str::contains($this->uri, '/v1/');
     }
 }
