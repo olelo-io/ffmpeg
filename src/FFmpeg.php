@@ -72,6 +72,19 @@ class FFmpeg
     }
 
     /**
+     * Get info about media file
+     *
+     * @param $file
+     * @return mixed
+     */
+    public function getInfo($file)
+    {
+        return $this->getResult('info', [
+            'file' => $file,
+        ]);
+    }
+
+    /**
      * Determine if the given path is a valid URL.
      *
      * @param  string  $path
