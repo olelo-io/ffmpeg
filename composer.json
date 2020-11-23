@@ -3,7 +3,7 @@
     "description": "Small helper to connect to olelo FFmpeg URLs in PHP",
     "license": "MIT",
     "require": {
-        "guzzlehttp/guzzle": "^6.3"
+        "guzzlehttp/guzzle": "^6.3|^7.0"
     },
     "require-dev": {
         "orchestra/testbench": "~3.0"
